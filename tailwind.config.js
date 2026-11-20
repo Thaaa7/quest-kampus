@@ -1,0 +1,90 @@
+/** Token diambil langsung dari ekspor Stitch (DESIGN.md Kampus Quest). */
+import forms from '@tailwindcss/forms';
+import containerQueries from '@tailwindcss/container-queries';
+
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        './resources/views/**/*.blade.php',
+        './resources/js/**/*.js',
+        './app/**/*.php',
+    ],
+    theme: {
+        extend: {
+            colors: {
+                'primary': '#1E5B4B',
+                'on-primary': '#FFFFFF',
+                'primary-container': '#E3EEEA',
+                'on-primary-container': '#1E5B4B',
+                'secondary': '#9A5B0B',
+                'on-secondary': '#FFFFFF',
+                'secondary-container': '#F7EEDC',
+                'on-secondary-container': '#9A5B0B',
+                'accent': '#B23A22',
+                'on-accent': '#FFFFFF',
+                'accent-container': '#F8E8E3',
+                'on-accent-container': '#B23A22',
+                'background': '#F6F5F0',
+                'on-background': '#1B2420',
+                'surface': '#FFFFFF',
+                'on-surface': '#1B2420',
+                'on-surface-variant': '#4F5A54',
+                'outline': '#8A8F86',
+                'outline-variant': '#D9D6CC',
+                'meter-empty': '#E4E1D8',
+                'camera-surface': '#121816',
+                'on-camera-surface': '#FFFFFF',
+                'error': '#B23A22',
+                'on-error': '#FFFFFF',
+            },
+            borderRadius: {
+                'sm': '2px',
+                'DEFAULT': '6px',
+                'md': '6px',
+                'lg': '8px',
+                'full': '9999px',
+            },
+            spacing: {
+                'xs': '4px',
+                'sm': '8px',
+                'md': '12px',
+                'lg': '16px',
+                'xl': '24px',
+                '2xl': '32px',
+                '3xl': '48px',
+            },
+            fontFamily: {
+                'display': ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+                'headline': ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                'title': ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                'body': ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                'label': ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                'caption': ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                'code': ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+            },
+            fontSize: {
+                'display-stopwatch': ['40px', { lineHeight: '44px', fontWeight: '600' }],
+                'display-stopwatch-mobile': ['32px', { lineHeight: '36px', fontWeight: '600' }],
+                'display': ['28px', { lineHeight: '34px', fontWeight: '700' }],
+                'headline': ['22px', { lineHeight: '28px', fontWeight: '700' }],
+                'title': ['18px', { lineHeight: '24px', fontWeight: '600' }],
+                'body': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+                'label': ['14px', { lineHeight: '20px', fontWeight: '500' }],
+                'caption': ['12px', { lineHeight: '16px', fontWeight: '500' }],
+                'code': ['14px', { lineHeight: '20px', fontWeight: '500' }],
+                'code-sm': ['13px', { lineHeight: '18px', fontWeight: '500' }],
+            },
+            transitionDuration: {
+                'state-change': '100ms',
+                'surface-enter': '200ms',
+                'surface-exit': '150ms',
+            },
+            transitionTimingFunction: {
+                'state-change': 'ease-out',
+                'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+                'surface-exit': 'cubic-bezier(0.3, 0, 1, 1)',
+            },
+        },
+    },
+    plugins: [forms, containerQueries],
+};

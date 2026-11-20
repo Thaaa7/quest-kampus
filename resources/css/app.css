@@ -1,0 +1,197 @@
+/* Font disimpan sendiri (bukan Google Fonts) supaya tetap jalan di jaringan kampus tanpa internet. */
+@import '@fontsource/plus-jakarta-sans/latin-400.css';
+@import '@fontsource/plus-jakarta-sans/latin-500.css';
+@import '@fontsource/plus-jakarta-sans/latin-600.css';
+@import '@fontsource/plus-jakarta-sans/latin-700.css';
+@import '@fontsource/ibm-plex-mono/latin-500.css';
+@import '@fontsource/ibm-plex-mono/latin-600.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* Atribut hidden harus menang dari class display seperti flex atau grid. */
+    [hidden] {
+        display: none !important;
+    }
+
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        @apply bg-background text-on-surface font-body text-body antialiased;
+    }
+
+    /* Semua kontrol yang bisa dipakai menunjukkan kursor tangan. */
+    a[href], button:not(:disabled), summary, select, label[for],
+    input[type='checkbox']:not(:disabled), input[type='radio']:not(:disabled),
+    [role='button'], [role='tab'] {
+        cursor: pointer;
+    }
+
+    button:disabled, input:disabled, select:disabled, textarea:disabled {
+        cursor: not-allowed;
+    }
+
+    :focus-visible {
+        outline: 2px solid theme('colors.primary');
+        outline-offset: 2px;
+    }
+
+    .tabular-nums, .font-code {
+        font-variant-numeric: tabular-nums;
+    }
+
+    dialog::backdrop {
+        background: rgb(27 36 32 / 0.45);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+        }
+    }
+}
+
+@layer components {
+    .skip-link {
+        @apply sr-only focus:not-sr-only focus:fixed focus:left-lg focus:top-lg focus:z-50 focus:rounded-md focus:bg-surface focus:px-lg focus:py-sm focus:text-primary focus:shadow;
+    }
+
+    /* Tombol: radius 6px, tinggi minimal 48px di mobile dan 40px di desktop. */
+    .btn {
+        @apply inline-flex min-h-[48px] items-center justify-center gap-sm rounded-md px-lg font-label text-label transition-colors duration-state-change ease-state-change;
+    }
+
+    .btn-sm {
+        @apply min-h-[40px];
+    }
+
+    .btn-primary {
+        @apply btn bg-primary text-on-primary hover:bg-[#174a3c] active:bg-[#123b30] disabled:bg-meter-empty disabled:text-on-surface-variant;
+    }
+
+    .btn-secondary {
+        @apply btn border border-primary bg-surface text-primary hover:bg-primary-container active:bg-[#d3e4de] disabled:border-outline-variant disabled:text-on-surface-variant disabled:hover:bg-surface;
+    }
+
+    .btn-danger {
+        @apply btn bg-accent text-on-accent hover:bg-[#9a3019] active:bg-[#822814];
+    }
+
+    .btn-danger-outline {
+        @apply btn border border-accent bg-surface text-accent hover:bg-accent-container active:bg-[#f2d6ce];
+    }
+
+    .btn-ghost {
+        @apply btn px-md text-primary hover:bg-primary-container active:bg-[#d3e4de];
+    }
+
+    .btn-icon {
+        @apply inline-flex h-[44px] w-[44px] items-center justify-center rounded-md text-on-surface transition-colors duration-state-change hover:bg-primary-container active:bg-[#d3e4de];
+    }
+
+    .card {
+        @apply rounded-lg border border-outline-variant bg-surface;
+    }
+
+    .field-label {
+        @apply font-label text-label text-on-surface;
+    }
+
+    .input {
+        @apply block w-full rounded-md border border-outline bg-surface px-md py-md font-body text-body text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:ring-1 focus:ring-primary;
+    }
+
+    .input-error {
+        @apply border-accent focus:border-accent focus:ring-accent;
+    }
+
+    .field-error {
+        @apply font-caption text-caption text-accent;
+    }
+
+    .link {
+        @apply font-label text-label text-primary underline decoration-1 underline-offset-2 hover:text-[#123b30];
+    }
+
+    .section-title {
+        @apply font-title text-title text-on-surface;
+    }
+
+    .meta {
+        @apply font-caption text-caption text-on-surface-variant;
+    }
+
+    .notice {
+        @apply rounded-lg border px-lg py-md font-label text-label;
+    }
+
+    .notice-success {
+        @apply notice border-primary bg-primary-container text-on-primary-container;
+    }
+
+    .notice-error {
+        @apply notice border-accent bg-accent-container text-on-accent-container;
+    }
+
+    .notice-info {
+        @apply notice border-outline-variant bg-surface text-on-surface;
+    }
+
+    .tab {
+        @apply inline-flex min-h-[44px] items-center border-b-2 border-transparent px-md font-label text-label text-on-surface-variant hover:text-on-surface;
+    }
+
+    .tab-active {
+        @apply border-primary font-semibold text-primary;
+    }
+
+    .chip {
+        @apply inline-flex min-h-[40px] items-center rounded-md border border-outline-variant bg-surface px-md font-label text-label text-on-surface hover:border-outline;
+    }
+
+    .chip-active {
+        @apply border-primary bg-primary-container text-primary;
+    }
+
+    .dialog {
+        @apply w-[min(560px,calc(100vw-32px))] rounded-lg border border-outline-variant bg-surface p-0 text-on-surface shadow-[0_8px_24px_rgba(27,36,32,0.12)];
+    }
+
+    .th {
+        @apply px-sm py-sm text-left font-caption text-caption text-on-surface-variant;
+    }
+
+    .td {
+        @apply px-sm py-md align-middle;
+    }
+
+    /* Bingkai pemindai: hanya empat sudut. */
+    .scan-frame {
+        background:
+            linear-gradient(#fff, #fff) top left / 32px 4px no-repeat,
+            linear-gradient(#fff, #fff) top left / 4px 32px no-repeat,
+            linear-gradient(#fff, #fff) top right / 32px 4px no-repeat,
+            linear-gradient(#fff, #fff) top right / 4px 32px no-repeat,
+            linear-gradient(#fff, #fff) bottom left / 32px 4px no-repeat,
+            linear-gradient(#fff, #fff) bottom left / 4px 32px no-repeat,
+            linear-gradient(#fff, #fff) bottom right / 32px 4px no-repeat,
+            linear-gradient(#fff, #fff) bottom right / 4px 32px no-repeat;
+        box-shadow: 0 0 0 9999px rgb(18 24 22 / 0.55);
+    }
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: #fff;
+    }
+}
