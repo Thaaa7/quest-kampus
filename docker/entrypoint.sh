@@ -42,4 +42,9 @@ done
 php artisan config:cache --no-interaction
 chown -R www-data:www-data storage bootstrap/cache
 
+# Apache hanya boleh memuat satu MPM. Railway kadang menambahkan mpm_event saat container
+# menyala, jadi pastikan yang aktif hanya mpm_prefork (yang dibutuhkan mod_php).
+rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.*
+a2enmod -q mpm_prefork >/dev/null 2>&1 || true
+
 exec apache2-foreground
