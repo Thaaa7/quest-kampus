@@ -196,67 +196,133 @@ function setupCameraCapture() {
     });
 }
 
-/* Pemindai QR ruangan. Hanya alamat stiker Kampus Quest yang diterima. */
+/* Baca QR dari bagian tengah gambar (crop 1 = seluruh gambar), diperkecil supaya cepat. */
+function decodeQr(source, width, height, ctx, { crop = 1, maxSide = 720, inversion = 'dontInvert' } = {}) {
+    const sw = width * crop;
+    const sh = height * crop;
+    const scale = Math.min(1, maxSide / Math.max(sw, sh));
+    const w = Math.max(1, Math.round(sw * scale));
+    const h = Math.max(1, Math.round(sh * scale));
+    ctx.canvas.width = w;
+    ctx.canvas.height = h;
+    ctx.drawImage(source, (width - sw) / 2, (height - sh) / 2, sw, sh, 0, 0, w, h);
+    const data = ctx.getImageData(0, 0, w, h);
+    return jsQR(data.data, w, h, { inversionAttempts: inversion })?.data ?? null;
+}
+
+/* BarcodeDetector hanya dipakai kalau browser benar-benar mendukung QR. */
+async function createQrDetector() {
+    if (!('BarcodeDetector' in window)) return null;
+    try {
+        const formats = await window.BarcodeDetector.getSupportedFormats?.();
+        if (formats && !formats.includes('qr_code')) return null;
+        return new window.BarcodeDetector({ formats: ['qr_code'] });
+    } catch {
+        return null;
+    }
+}
+
+/* Pemindai QR ruangan. Hanya alamat stiker Kampus Quest yang diterima.
+   jsQR selalu ikut membaca, karena di sebagian ponsel Android detektor bawaan
+   browser tidak mengembalikan hasil apa pun tanpa pesan galat. */
 function setupScanner() {
     const root = $('[data-scanner]');
     if (!root) return;
     const prefix = root.dataset.prefix;
     const video = $('video', root);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const ctx = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
     const denied = $('#scan-denied');
     const live = $('#scan-live');
     const unknown = $('#scan-unknown');
     const torchBtn = $('[data-torch]', root);
+    const photoInput = $('[data-scan-photo]', root);
+    const photoStatus = $('[data-scan-photo-status]', root);
     let stream = null;
+    let detector = null;
     let busy = false;
     let lastWrong = '';
+    let frame = 0;
 
-    const detector = 'BarcodeDetector' in window ? new window.BarcodeDetector({ formats: ['qr_code'] }) : null;
-
-    const handle = (text) => {
-        if (!text) return;
+    const handle = (raw) => {
+        const text = raw?.trim();
+        if (!text) return false;
         if (text.startsWith(prefix)) {
             busy = true;
             window.location.href = text;
-            return;
+            return true;
         }
         if (text !== lastWrong) {
             lastWrong = text;
             unknown.showModal();
         }
+        return true;
     };
 
     const scan = async () => {
         if (!stream || busy) return;
-        if (!unknown.open && video.readyState >= 2) {
-            try {
-                if (detector) {
-                    const codes = await detector.detect(video);
-                    handle(codes[0]?.rawValue);
-                } else {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    ctx.drawImage(video, 0, 0);
-                    const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    handle(jsQR(data.data, data.width, data.height, { inversionAttempts: 'dontInvert' })?.data);
+        if (!unknown.open && video.readyState >= 2 && video.videoWidth) {
+            let text = null;
+            if (detector) {
+                try {
+                    text = (await detector.detect(video))[0]?.rawValue ?? null;
+                } catch {
+                    detector = null;
                 }
-            } catch {
-                /* frame belum siap, coba di frame berikutnya */
             }
+            if (!text) {
+                try {
+                    // Bergantian: area bingkai di tengah, lalu seluruh tampilan kamera.
+                    text = decodeQr(video, video.videoWidth, video.videoHeight, ctx, { crop: frame % 2 ? 1 : 0.65 });
+                } catch {
+                    /* frame belum siap, coba di frame berikutnya */
+                }
+            }
+            frame += 1;
+            handle(text);
         }
-        setTimeout(() => requestAnimationFrame(scan), 200);
+        setTimeout(() => requestAnimationFrame(scan), 150);
     };
 
+    photoInput?.addEventListener('change', async () => {
+        const file = photoInput.files?.[0];
+        photoInput.value = '';
+        if (!file) return;
+        photoStatus.hidden = false;
+        photoStatus.textContent = 'Membaca QR dari foto...';
+        try {
+            const image = await createImageBitmap(file);
+            let text = null;
+            if (detector) {
+                text = (await detector.detect(image).catch(() => []))[0]?.rawValue ?? null;
+            }
+            for (const crop of [1, 0.6]) {
+                if (text) break;
+                text = decodeQr(image, image.width, image.height, ctx, { crop, maxSide: 1200, inversion: 'attemptBoth' });
+            }
+            image.close?.();
+            if (handle(text)) {
+                photoStatus.hidden = true;
+            } else {
+                photoStatus.textContent = 'QR belum terbaca. Foto lebih dekat sampai QR terlihat jelas dan tidak buram, lalu coba lagi.';
+            }
+        } catch {
+            photoStatus.textContent = 'Foto tidak bisa dibuka. Coba ambil foto lagi.';
+        }
+    });
+
     const start = async () => {
+        detector = await createQrDetector();
         if (!navigator.mediaDevices?.getUserMedia) {
             live.hidden = true;
             denied.hidden = false;
-            $('[data-denied-reason]', denied).textContent = 'Browser ini belum bisa membuka kamera dari halaman ini. Buka aplikasi kamera bawaan ponsel lalu arahkan ke stiker QR, tautannya akan membuka Kampus Quest.';
+            $('[data-denied-reason]', denied).textContent = 'Browser ini belum bisa membuka kamera dari halaman ini. Pakai tombol Foto QR di bawah, atau buka aplikasi kamera bawaan ponsel lalu arahkan ke stiker QR.';
             return;
         }
         try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+                audio: false,
+            });
         } catch {
             live.hidden = true;
             denied.hidden = false;

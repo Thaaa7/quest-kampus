@@ -27,7 +27,8 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect($request->user()->homeRoute());
+        // Kalau sebelumnya membuka QR ruangan (atau halaman lain) sebelum login, kembali ke sana.
+        return redirect()->intended($request->user()->homeRoute());
     }
 
     public function logout(Request $request)

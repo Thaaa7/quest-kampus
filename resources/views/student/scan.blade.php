@@ -24,6 +24,17 @@
             <p class="text-body text-on-surface-variant" data-denied-reason>Izinkan akses kamera untuk memindai QR ruangan. Buka pengaturan situs di browser, ubah izin Kamera menjadi Izinkan, lalu muat ulang halaman ini.</p>
             <a href="{{ route('scan') }}" class="btn-primary w-full">Coba Lagi</a>
         </section>
+
+        <section class="flex flex-col gap-sm" aria-labelledby="scan-photo-title">
+            <h2 id="scan-photo-title" class="font-label text-label">Kamera tidak menangkap QR?</h2>
+            <label class="btn-secondary w-full cursor-pointer focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-on-camera-surface">
+                <x-icon name="photo_camera" class="h-5 w-5" />
+                Foto QR
+                <input type="file" accept="image/*" capture="environment" class="sr-only" data-scan-photo>
+            </label>
+            <p class="font-label text-label" role="status" data-scan-photo-status hidden></p>
+            <p class="font-label text-label opacity-80">Foto stiker dari dekat, atau buka aplikasi kamera bawaan HP lalu arahkan ke stiker.</p>
+        </section>
     </div>
 
     <x-slot:after>

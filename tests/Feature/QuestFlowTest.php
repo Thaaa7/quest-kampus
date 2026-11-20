@@ -57,6 +57,17 @@ class QuestFlowTest extends TestCase
             ->assertRedirect(route('technician.queue'));
     }
 
+    public function test_scanning_while_logged_out_returns_to_the_room_after_login(): void
+    {
+        User::factory()->create(['identifier' => '2210009', 'password' => 'rahasia123']);
+        $roomUrl = route('room.show', $this->room->qr_token);
+
+        $this->get($roomUrl)->assertRedirect(route('login'));
+        $this->post(route('login.attempt'), ['identifier' => '2210009', 'password' => 'rahasia123'])
+            ->assertRedirect($roomUrl);
+        $this->get($roomUrl)->assertOk()->assertSee('C-302');
+    }
+
     public function test_reporting_requires_a_recent_scan_of_the_room_qr(): void
     {
         $student = User::factory()->create();

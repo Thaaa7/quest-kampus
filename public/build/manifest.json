@@ -48,7 +48,7 @@
     "src": "node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-700-normal.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-uTv1WwR4.css",
+    "file": "assets/app-B8HvEZKV.css",
     "name": "app",
     "names": [
       "app.css"
@@ -71,7 +71,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-tErKE8Vy.js",
+    "file": "assets/app-TIcaAQIh.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
