@@ -72,4 +72,9 @@ return [
     ],
 
     'photo_max_kb' => 8192,
+
+    // Tempat foto quest disimpan: "disk" (storage/app/private) atau "database".
+    // Pakai "database" di hosting yang disknya tidak permanen, misalnya Render gratis.
+    'photo_store' => env('KQ_PHOTO_STORE', 'disk'),
+
 ];

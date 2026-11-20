@@ -234,4 +234,18 @@ class QuestFlowTest extends TestCase
         $this->assertNotNull($this->room->fresh()->qr_printed_at);
         $this->get(route('admin.stats'))->assertOk();
     }
+
+    public function test_photos_can_live_in_the_database_for_hosts_without_a_disk(): void
+    {
+        config(['kampusquest.photo_store' => 'database']);
+        $student = User::factory()->create();
+        $quest = $this->scanAndReport($student);
+
+        Storage::disk('local')->assertMissing($quest->photo_before);
+        $this->assertDatabaseHas('photos', ['path' => $quest->photo_before, 'mime' => 'image/jpeg']);
+        $this->get(route('photo', [$quest, 'before']))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/jpeg')
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
+    }
 }

@@ -6,6 +6,7 @@ use App\Models\Quest;
 use App\Models\QuestConfirmation;
 use App\Models\Room;
 use App\Models\User;
+use App\Support\PhotoStore;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -22,7 +23,7 @@ class QuestService
 
     public function create(User $reporter, Room $room, string $category, string $description, UploadedFile $photo): Quest
     {
-        $path = $photo->store('quests', 'local');
+        $path = PhotoStore::store($photo);
 
         return DB::transaction(function () use ($reporter, $room, $category, $description, $path) {
             $quest = Quest::create([
@@ -91,7 +92,7 @@ class QuestService
             throw new InvalidArgumentException('Tekan Mulai Kerjakan dulu sebelum menyelesaikan quest.');
         }
 
-        $path = $photoAfter->store('quests', 'local');
+        $path = PhotoStore::store($photoAfter);
         $xp = config('kampusquest.xp');
 
         return DB::transaction(function () use ($technician, $quest, $path, $note, $xp) {

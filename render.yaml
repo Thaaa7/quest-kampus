@@ -1,0 +1,61 @@
+# Blueprint Render: satu web service Docker + satu database Postgres, keduanya paket gratis.
+# Di dashboard Render: New > Blueprint > pilih repo ini > Apply.
+databases:
+  - name: kampus-quest-db
+    plan: free
+    region: singapore
+    databaseName: quest_kampus
+    user: kampusquest
+    # Hanya bisa diakses dari layanan Render di akun yang sama.
+    ipAllowList: []
+
+services:
+  - type: web
+    name: kampus-quest
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
+    autoDeploy: true
+    envVars:
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_URL
+        fromDatabase:
+          name: kampus-quest-db
+          property: connectionString
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: APP_NAME
+        value: Kampus Quest
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_LOCALE
+        value: id
+      - key: APP_FALLBACK_LOCALE
+        value: id
+      - key: APP_TIMEZONE
+        value: Asia/Makassar
+      # Disk Render gratis terhapus setiap server tidur, jadi foto disimpan di database.
+      - key: KQ_PHOTO_STORE
+        value: database
+      - key: TRUSTED_PROXIES
+        value: "*"
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: warning
+      # CPU paket gratis kecil (0,1 CPU); 10 putaran bcrypt membuat login tidak terlalu lambat.
+      - key: BCRYPT_ROUNDS
+        value: "10"

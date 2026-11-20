@@ -9,9 +9,9 @@ use App\Models\Room;
 use App\Models\User;
 use App\Services\XpService;
 use App\Support\Categories;
+use App\Support\PhotoStore;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Data contoh untuk mencoba semua layar. Semua nama dan angka di sini adalah
@@ -193,7 +193,7 @@ class DatabaseSeeder extends Seeder
 </svg>
 SVG;
         $path = "quests/demo-{$quest->id}-{$which}.svg";
-        Storage::disk('local')->put($path, $svg);
+        PhotoStore::put($path, $svg, 'image/svg+xml');
 
         return $path;
     }

@@ -75,6 +75,25 @@ Browser hanya mengizinkan kamera di halaman HTTPS atau `localhost`. Jalankan `ph
 
 Untuk pemindai di dalam aplikasi, pakai HTTPS. Di Laragon: pindahkan folder proyek ke `C:\laragon\www`, aktifkan SSL di menu Apache, lalu buka `https://kampus-quest.test` dan ubah `APP_URL` di `.env` ke alamat itu.
 
+## Hosting gratis (Render)
+
+Repo ini sudah berisi `Dockerfile` dan `render.yaml`, jadi bisa dipasang di [Render](https://render.com) paket gratis tanpa kartu kredit:
+
+1. Masuk ke Render dengan akun GitHub.
+2. Pilih **New > Blueprint**, hubungkan repo `quest-kampus`, lalu tekan **Apply**.
+3. Render membuat dua layanan di region Singapura: web `kampus-quest` (Docker) dan database Postgres `kampus-quest-db`. Build pertama butuh sekitar 5 sampai 10 menit.
+4. Setelah status web menjadi **Live**, buka alamat `https://kampus-quest-xxxx.onrender.com` yang tampil di dashboard. Data demo dibuat otomatis saat pertama menyala.
+
+Setiap push ke `main` memicu deploy ulang. Data di database tidak ikut terhapus.
+
+Batasan paket gratis yang perlu kamu tahu:
+
+- Server tidur setelah 15 menit tanpa pengunjung. Kunjungan berikutnya menunggu sekitar 1 menit sampai server bangun.
+- Database Postgres gratis berlaku 30 hari sejak dibuat. Setelah itu Render memberi 14 hari sebelum database dihapus, kecuali di-upgrade. Untuk mulai lagi, hapus database lama lalu jalankan Blueprint ulang.
+- Disk server terhapus setiap kali tidur, jadi foto quest disimpan di database (`KQ_PHOTO_STORE=database`).
+- Tidak ada akses terminal, jadi perintah `kq:user` tidak bisa dijalankan di sana. Pakai akun demo, dan ingat kata sandinya tertulis di README publik ini.
+- Di Render aplikasi memakai Postgres. Di laptop tetap MySQL seperti biasa.
+
 ## Membuat akun asli
 
 Belum ada halaman pendaftaran. Akun dibuat lewat perintah ini:

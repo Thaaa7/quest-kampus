@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quest;
-use Illuminate\Support\Facades\Storage;
+use App\Support\PhotoStore;
 
 class PhotoController extends Controller
 {
@@ -11,10 +11,8 @@ class PhotoController extends Controller
     {
         $path = $which === 'after' ? $quest->photo_after : $quest->photo_before;
 
-        abort_if(! $path || ! Storage::disk('local')->exists($path), 404);
+        abort_if(! $path, 404);
 
-        return Storage::disk('local')->response($path, null, [
-            'Cache-Control' => 'private, max-age=86400',
-        ]);
+        return PhotoStore::response($path) ?? abort(404);
     }
 }
